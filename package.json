@@ -1,0 +1,18 @@
+{
+  "name": "js2proto",
+  "version": "0.0.1",
+  "description": "Dumb utility to convert a JSON object into a protobuf message definition",
+  "bin": {
+    "js2proto": "js2proto.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/konsumer/js2proto.git"
+  },
+  "author": "David Konsumer <konsumer@jetboystudio.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/konsumer/js2proto/issues"
+  },
+  "homepage": "https://github.com/konsumer/js2proto#readme"
+}
