@@ -17,6 +17,11 @@ js2proto takes JSON on stdin, and outputs a protobuf to stdout.
 cat MYFILE.json | js2proto TypeName > typename.proto
 ```
 
+Where
+* MYFILE.json is your JSON file
+* TypeName is the name of your message-type
+* typename.proto is the name of the file you want to output
+
 ## notes
 
 
