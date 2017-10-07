@@ -48,9 +48,6 @@ const getProtoType = (obj) => {
 }
 
 const getTypesForObject = (js, name) => {
-  if (js === null || js === undefined) {
-    return `Null ${name} = ${i + 1};` // you should define message Null {} somewhere else
-  }
   return `message ${name} {\n` + Object.keys(js).map((k, i) => `  ${getProtoType(js[k])} ${k} = ${i + 1};`)
   .join('\n') + '\n}'
 }
