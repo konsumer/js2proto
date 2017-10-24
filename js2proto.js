@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+const classify = require('inflection').classify
+
 if (!process.argv[2]) {
   console.error(`
 Usage: cat MYFILE.json | js2proto TypeName > typename.proto
@@ -13,50 +15,63 @@ Where
   process.exit(1)
 }
 
-let innerCount = 0
+let data = ''
+const messages = {}
 
 const isFloat = n => n === +n && n !== (n | 0)
-const getProtoType = (obj) => {
-  const t = typeof obj
+
+process.stdin.on('data', (chunk) => {
+  data += chunk
+})
+
+process.stdin.on('end', () => {
+  const obj = JSON.parse(data)
+  // get all message-types
+  handleMessage(obj, process.argv[2])
+  console.log('syntax = "proto3";\n')
+  Object.keys(messages).forEach(key => {
+    console.log(`message ${key} {`)
+    console.log('  ' + messages[key].join('\n  '))
+    console.log('}\n')
+  })
+})
+
+const getType = (val) => {
+  let t = typeof val
+  if (t === 'object' && Array.isArray(val)) {
+    return 'array'
+  }
   if (t === 'number') {
-    if (isFloat(obj)) {
+    if (isFloat(val)) {
       return 'float'
     } else {
-      return obj < 0 ? 'sint32' : 'uint32'
+      return 'int32'
     }
   }
-
-  if (t === 'object') {
-    if (Array.isArray(obj)) {
-      return 'repeated ' + getProtoType(obj[0])
-    } else {
-      innerCount++
-      return getTypesForObject(obj, `InnerType${innerCount}`).split('\n').join('\n  ') + `\n  InnerType${innerCount}`
-    }
-  }
-
-  if (t === 'string') {
-    if (Number(obj) == obj) {
-      return 'int64'
-    }
-    return 'string'
-  }
-
   if (t === 'boolean') {
     return 'bool'
   }
+  return t
 }
 
-const getTypesForObject = (js, name) => {
-  return `message ${name} {\n` + Object.keys(js).map((k, i) => `  ${getProtoType(js[k])} ${k} = ${i + 1};`)
-  .join('\n') + '\n}'
+const handleMessage = (obj, name) => {
+  messages[name] = Object.keys(obj).map((key, i) => {
+    const t = getType(obj[key])
+    switch (t) {
+      case 'array':
+        const rt = getType(obj[key][0])
+        if (rt === 'object') {
+          handleMessage(obj[key][0], classify(key))
+          return `repeated ${classify(key)} = ${i + 1};`
+        } else {
+          return `repeated ${rt} ${key} = ${i + 1};`
+        }
+      case 'object':
+        messages[classify(key)] = handleMessage(obj[key], classify(key))
+        return `${classify(key)} ${key} = ${i + 1};`
+      default:
+        return `${t} ${key} = ${i + 1};`
+    }
+  })
+  return messages[name]
 }
-
-let out = ''
-process.stdin.on('readable', () => {
-  const chunk = process.stdin.read()
-  if (chunk !== null) {
-    out += chunk.toString()
-  }
-})
-process.stdin.on('end', () => { console.log('syntax = "proto3";\n\n' + getTypesForObject(JSON.parse(out), process.argv[2])) })

@@ -14,5 +14,8 @@
   "bugs": {
     "url": "https://github.com/konsumer/js2proto/issues"
   },
-  "homepage": "https://github.com/konsumer/js2proto#readme"
+  "homepage": "https://github.com/konsumer/js2proto#readme",
+  "dependencies": {
+    "inflection": "^1.12.0"
+  }
 }

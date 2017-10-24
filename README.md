@@ -2,7 +2,7 @@
 
 Dumb utility to convert a JSON object into a protobuf message definition
 
-You could be using a struct to describe the general concept of JSON, but this will try to guess the defined scalar types, so you can quickly build a spec for some random JSON.
+With this tool you can quickly build a spec for some random JSON. It's not 100%, and you may have to tune it by hand, but it will get you started.
 
 ## install
 
@@ -22,10 +22,6 @@ Where
 * TypeName is the name of your message-type
 * typename.proto is the name of the file you want to output
 
-## notes
-
-
-
 ## example
 
 ```json
@@ -43,22 +39,37 @@ Where
 }
 ```
 
-becomes
+becomes (via `cat test.json | js2proto Test`)
+
+```proto
+syntax = "proto3";
+
+message TestObj {
+  int32 testNum = 1;
+  string testString = 2;
+  bool testBool = 3;
+  repeated int32 testArray = 4;
+}
+
+message Test {
+  int32 testNum = 1;
+  string testString = 2;
+  bool testBool = 3;
+  repeated int32 testArray = 4;
+  TestObj testObj = 5;
+}
+```
+
+By comparing `Test` with `TestObject`, you can infer that it's a recursive `Test` structure, and further tune it by hand:
 
 ```proto
 syntax = "proto3";
 
 message Test {
-  uint32 testNum = 1;
+  int32 testNum = 1;
   string testString = 2;
   bool testBool = 3;
-  repeated uint32 testArray = 4;
-  message InnerType1 {
-    uint32 testNum = 1;
-    string testString = 2;
-    bool testBool = 3;
-    repeated uint32 testArray = 4;
-  }
-  InnerType1 testObj = 5;
+  repeated int32 testArray = 4;
+  Test testObj = 5;
 }
 ```
