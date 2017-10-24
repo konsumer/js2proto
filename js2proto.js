@@ -54,6 +54,14 @@ const getType = (val) => {
   return t
 }
 
+const getMessageName = (name) => {
+  let n = classify(name)
+  if (messages[n]) {
+    n += `_${Math.random().toString(36).substring(7).toUpperCase()}`
+  }
+  return n
+}
+
 const handleMessage = (obj, name) => {
   messages[name] = Object.keys(obj).map((key, i) => {
     const t = getType(obj[key])
@@ -61,14 +69,16 @@ const handleMessage = (obj, name) => {
       case 'array':
         const rt = getType(obj[key][0])
         if (rt === 'object') {
-          handleMessage(obj[key][0], classify(key))
-          return `repeated ${classify(key)} = ${i + 1};`
+          const iname = getMessageName(key)
+          handleMessage(obj[key][0], iname)
+          return `repeated ${iname} ${key} = ${i + 1};`
         } else {
           return `repeated ${rt} ${key} = ${i + 1};`
         }
       case 'object':
-        messages[classify(key)] = handleMessage(obj[key], classify(key))
-        return `${classify(key)} ${key} = ${i + 1};`
+        const iname = getMessageName(key)
+        messages[name] = handleMessage(obj[key], iname)
+        return `${iname} ${key} = ${i + 1};`
       default:
         return `${t} ${key} = ${i + 1};`
     }
