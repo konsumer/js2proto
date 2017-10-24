@@ -1,6 +1,6 @@
 {
   "name": "js2proto",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Dumb utility to convert a JSON object into a protobuf message definition",
   "bin": {
     "js2proto": "js2proto.js"
