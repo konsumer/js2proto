@@ -1,4 +1,10 @@
-# js2proto
+# DEPRACATED
+
+Use [json2x](https://github.com/konsumer/json2x) instead. It does imilar, but lots more.
+
+Original README:
+
+---
 
 Dumb utility to convert a JSON object into a protobuf message definition
 
